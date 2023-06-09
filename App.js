@@ -1,20 +1,35 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from "react-native";
+import { useState } from "react";
+import useWebSocket from "react-use-websocket";
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+	const [data, setData] = useState({});
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+	const { lastJsonMessage } = useWebSocket(
+		`wss://stream.binance.com:9443/ws/btcusdt@ticker`,
+		{
+			onOpen: () => {},
+			onMessage: () => {
+				if (lastJsonMessage) {
+					setData({
+						priceChange: parseFloat(lastJsonMessage.p),
+						priceChangePercent: parseFloat(lastJsonMessage.P),
+						close: lastJsonMessage.c,
+						high: lastJsonMessage.h,
+						low: lastJsonMessage.l,
+						quoteVolume: lastJsonMessage.q,
+					});
+				}
+			},
+			onError: (event) => console.error(event),
+			shouldReconnect: (closeEvent) => true,
+			reconnectInterval: 3000,
+		}
+	);
+
+	return (
+		<View>
+			<Text>{JSON.stringify(data)}</Text>
+		</View>
+	);
+}

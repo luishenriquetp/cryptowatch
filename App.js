@@ -1,12 +1,16 @@
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { useState } from "react";
 import useWebSocket from "react-use-websocket";
+import { Input, Text } from "react-native-elements";
+import { Feather as Icon } from "@expo/vector-icons";
 
 export default function App() {
+	const [text, setText] = useState("BTCUSDT");
+	const [symbol, setSymbol] = useState("btcusdt");
 	const [data, setData] = useState({});
 
 	const { lastJsonMessage } = useWebSocket(
-		`wss://stream.binance.com:9443/ws/btcusdt@ticker`,
+		`wss://stream.binance.com:9443/ws/${symbol}@ticker`,
 		{
 			onOpen: () => {},
 			onMessage: () => {
@@ -28,7 +32,31 @@ export default function App() {
 	);
 
 	return (
-		<View>
+		<View
+			style={{
+				flexDirection: "column",
+				marginTop: 40,
+				margin: 20,
+				alignContent: "center",
+			}}
+		>
+			<Text h1>CryptoWatch 1.0</Text>
+			<Input
+				title="Digite o par de moedas."
+				autoCapitalize="characters"
+				leftIcon={<Icon name="dollar-sign" size={24} color="black" />}
+				value={text}
+				rightIcon={
+					<Icon.Button
+						name="search"
+						size={24}
+						color="black"
+						backgroundColor="transparent"
+						onPress={(evt) => setSymbol(text.toLowerCase())}
+					/>
+				}
+				onChangeText={(txt) => setText(txt.toUpperCase())}
+			/>
 			<Text>{JSON.stringify(data)}</Text>
 		</View>
 	);

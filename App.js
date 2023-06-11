@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { useState } from "react";
 import useWebSocket from "react-use-websocket";
 import { Input, Text } from "react-native-elements";
@@ -30,34 +30,76 @@ export default function App() {
 			reconnectInterval: 3000,
 		}
 	);
+	const styles = StyleSheet.create({
+		line: {
+			flexDirection: "row",
+			width: "100%",
+			marginHorizontal: 10,
+			marginVertical: 10,
+		},
+		bold: {
+			fontWeight: "bold",
+		},
+	});
+	function getSignal(value) {
+		return value >= 0 ? `+${value}` : value;
+	}
 
 	return (
-		<View
-			style={{
-				flexDirection: "column",
-				marginTop: 40,
-				margin: 20,
-				alignContent: "center",
-			}}
-		>
-			<Text h1>CryptoWatch 1.0</Text>
-			<Input
-				title="Digite o par de moedas."
-				autoCapitalize="characters"
-				leftIcon={<Icon name="dollar-sign" size={24} color="black" />}
-				value={text}
-				rightIcon={
-					<Icon.Button
-						name="search"
-						size={24}
-						color="black"
-						backgroundColor="transparent"
-						onPress={(evt) => setSymbol(text.toLowerCase())}
-					/>
-				}
-				onChangeText={(txt) => setText(txt.toUpperCase())}
-			/>
-			<Text>{JSON.stringify(data)}</Text>
-		</View>
+		<>
+			<View
+				style={{
+					flexDirection: "column",
+					marginTop: 40,
+					margin: 20,
+					alignContent: "center",
+				}}
+			>
+				<Text h1>CryptoWatch 1.0</Text>
+				<Input
+					title="Digite o par de moedas."
+					autoCapitalize="characters"
+					leftIcon={<Icon name="dollar-sign" size={24} color="black" />}
+					value={text}
+					rightIcon={
+						<Icon.Button
+							name="search"
+							size={24}
+							color="black"
+							backgroundColor="transparent"
+							onPress={(evt) => setSymbol(text.toLowerCase())}
+						/>
+					}
+					onChangeText={(txt) => setText(txt.toUpperCase())}
+				/>
+				<Text>{JSON.stringify(data)}</Text>
+			</View>
+			<View style={styles.line}>
+				<Text style={styles.bold}>Preço Atual: </Text>
+				<Text>{data.close}</Text>
+			</View>
+			<View style={styles.line}>
+				<Text style={styles.bold}>Alteração: </Text>
+				<Text>
+					{getSignal(data.priceChange)} ({getSignal(data.priceChangePercent)}%)
+				</Text>
+			</View>
+			<View style={styles.line}>
+				<Text style={styles.bold}>Máxima 24h: </Text>
+				<Text>{data.high}</Text>
+			</View>
+			<View style={styles.line}>
+				<Text style={styles.bold}>Mínima 24h: </Text>
+				<Text>{data.low}</Text>
+			</View>
+			<View style={styles.line}>
+				<Text style={styles.bold}>Trades: </Text>
+				<Text>{data.numberOfTrades}</Text>
+			</View>
+			<View style={styles.line}>
+				<Text style={styles.bold}>Volume: </Text>
+				<Text>{data.quoteVolume}</Text>
+			</View>
+		</>
 	);
 }
